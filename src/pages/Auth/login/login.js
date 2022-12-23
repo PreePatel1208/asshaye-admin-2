@@ -41,12 +41,16 @@ const Login = () => {
         }
 
         const res = await dispatch(login(data)).unwrap().then(res => {
-            setIsShow(true)
-            setIsSucess(true)
-            setToasterMessage("Login Successfully")
-            setTimeout(() => {
-                navigate("/dashboard")
-            }, 1000);
+            console.log("res",res);
+            if(res.status==201 || res.status==200){
+                setIsShow(true)
+                setIsSucess(true)
+                setToasterMessage("Login Successfully")
+                setTimeout(() => {
+                    navigate("/dashboard")
+                }, 1000);
+            }
+        
         }).catch(err => {
             setIsShow(true)
             setIsSucess(false)

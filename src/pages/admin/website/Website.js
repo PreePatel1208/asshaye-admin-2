@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addWebsite, deleteWebsite, editWebsite, getWebsites, restoreWebsite, trashWebsite } from '../../../store/reducer/websiteSlice';
 import Toaster from '../../../components/Toaster/Toaster';
 import Sample from './../../../assets/img/sample.png'
-import Ckeditor from '../../../components/Editor/Editor'
+import { useNavigate } from 'react-router-dom';
 
 const Website = () => {
 
@@ -26,6 +26,7 @@ const Website = () => {
     const [status, setStatus] = useState("all")
     const [text, setText] = useState("Are you sure to delete this website?")
     const [form] = Form.useForm();
+    const nevigate = useNavigate()
     const fileReader = new FileReader()
 
 
@@ -33,35 +34,12 @@ const Website = () => {
         setFilteredInfo(filters);
         setSortedInfo(sorter);
     };
-    const onChange = (key) => {
-        setStatus(key)
-        if (key == 'trash') {
-            setText("Are you sure to delete this website permanant?")
-        } else {
-            setText("Are you sure to delete this website?")
-        }
-        dispatch(getWebsites(key))
-    };
-    const changeStatus = (key) => {
-        setStatusVisibility(key)
-    };
-    const clearFilters = () => {
-        setFilteredInfo({});
-    };
-    const clearAll = () => {
-        setFilteredInfo({});
-        setSortedInfo({});
-    };
-    const setAgeSort = () => {
-        setSortedInfo({
-            order: 'descend',
-            columnKey: 'age',
-        });
-    };
+
+;
 
     const deleteWebsites = async (id) => {
         console.log(status);
-        await dispatch( deleteWebsite(id)).unwrap().then(res => {
+        await dispatch(deleteWebsite(id)).unwrap().then(res => {
             setIsShow(true)
             setIsSucess(true)
             if (res.status == 200) {
@@ -110,8 +88,8 @@ const Website = () => {
         setDataSource(WebsitesData.map(element => (
             {
                 key: element._id,
-                image: <img src={"http://localhost:2500/uploads/"+element.image?.filename} alt="" height="100px" width="100px" />,
-                body: <div dangerouslySetInnerHTML={{ __html: element.body }} /> ,
+                image: <img src={"http://localhost:2500/uploads/" + element.image?.filename} alt="" height="100px" width="100px" />,
+                body: <div dangerouslySetInnerHTML={{ __html: element.body }} />,
                 title: element.title,
                 slug: element.slug,
                 created: element.created,
@@ -141,7 +119,7 @@ const Website = () => {
             dataIndex: 'image',
             key: 'image',
             ellipsis: true,
-          
+
         },
         {
             title: 'slug',
@@ -261,6 +239,7 @@ const Website = () => {
                     <strong>Websites</strong>
                 </div>
                 <Button type="default" icon={<PlusOutlined />} size='middle' onClick={() => {
+                    nevigate("/posts/create")
                     setIsAddModalOpen(true);
                     form.setFieldsValue({
                         website: '',
@@ -301,19 +280,19 @@ const Website = () => {
                         },
                     ]}
                 /> */}
-              
-              <Table className='theme-table'
-              scroll={{ x: 600 }}
-              rowSelection={{
-                  type: Checkbox,
 
-              }} columns={columns} dataSource={dataSource} onChange={handleChange} />
-              
-                         
-           
+                <Table className='theme-table'
+                    scroll={{ x: 600 }}
+                    rowSelection={{
+                        type: Checkbox,
+
+                    }} columns={columns} dataSource={dataSource} onChange={handleChange} />
+
+
+
             </div>
-            
-      
+
+
 
         </>
     );

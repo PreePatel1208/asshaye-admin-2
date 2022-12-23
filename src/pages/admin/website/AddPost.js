@@ -9,34 +9,26 @@ import Ckeditor from '../../../components/Editor/Editor'
 const AddPost = () => {
     
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [filteredInfo, setFilteredInfo] = useState({});
-    const [sortedInfo, setSortedInfo] = useState({});
-    const [logoFile, setLogoFile] = useState(null);
-    const [Favicon, setFavicon] = useState(null);
-    const [statusVisibility, setStatusVisibility] = useState(true);
+    const [body, setBody] = useState(false);
+    const [thubnailFile, setThumbnailFile] = useState(null);
+    const [commentStatus, setCommentStatus] = useState(true);
     const dispatch = useDispatch()
-    const WebsitesData = useSelector((state) => state.website.websites)
     const [isShow, setIsShow] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
     const [toasterMessage, setToasterMessage] = useState("")
     const [isSucess, setIsSucess] = useState(false)
-    const [dataSource, setDataSource] = useState([])
-    const [status, setStatus] = useState("all")
-    const [text, setText] = useState("Are you sure to delete this website?")
+   
     const [form] = Form.useForm();
-    const fileReader = new FileReader()
     const onFinish = async (values) => {
-        let baseLogoFile;
-        let data
-        data = {
-            favicon_base64: Favicon ? Favicon : "",
-            image_base64: logoFile ? logoFile : "",
-            sort: values.sort,
-            status: statusVisibility,
-            title: values.website
-        }
+   
+        let data =new FormData()
+        
+        data.append("body",body) 
+        data.append("image",thubnailFile) 
+        data.append("slug",values.slug) 
+        data.append("comment_status",commentStatus) 
+        data.append("title",values.title) 
 
-        console.log(data);
         if (isEdit) {
             data = [data, { id: values.id }];
             await dispatch(editWebsite(data)).unwrap().then(res => {
@@ -61,8 +53,8 @@ const AddPost = () => {
                 console.log("res add", res);
                 setIsShow(true)
                 setIsSucess(true)
-                if (res.status == 201) {
-                    dispatch(getWebsites(status))
+                if (res.status == 200) {
+              
                     setToasterMessage("Website added sucessfully")
                     setIsAddModalOpen(false)
                 } else {
@@ -81,7 +73,7 @@ const AddPost = () => {
     };
    
     const changeStatus = (key) => {
-        setStatusVisibility(key)
+        setCommentStatus(key)
     };
   return (
     <div className='website-block theme-block'>
@@ -99,11 +91,8 @@ const AddPost = () => {
     <Row gutter={16} justify='center'>
         <Col span={24} className='text-center'>
             <Space>
-                <Upload className='theme-form-upload' onRemove={() => setLogoFile(null)} action={(data) => {
-                    fileReader.readAsDataURL(data);
-                    fileReader.onloadend = () => {
-                        setLogoFile(fileReader.result)
-                    }
+                <Upload className='theme-form-upload' onRemove={() => setThumbnailFile(null)} action={(data) => {
+                     setThumbnailFile(data)
                 }} listType="picture-card" maxCount={1}>
                     <div>
                         <PlusOutlined />
@@ -123,8 +112,7 @@ const AddPost = () => {
     </Row>
     <Row gutter={16}>
         <Col span={24} >
-
-            <Form.Item label="Title" name='Title' rules={[
+            <Form.Item label="Title" name='title' rules={[
                 {
                     required: true,
                     message: 'Please insert title ',
@@ -134,7 +122,20 @@ const AddPost = () => {
             </Form.Item>
         </Col>
     </Row>
-    <Ckeditor />
+
+    <Row gutter={16}>
+        <Col span={24} >
+            <Form.Item label="Slug" name='slug' rules={[
+                {
+                    required: true,
+                    message: 'Please insert slug ',
+                },
+            ]}>
+                <Input />
+            </Form.Item>
+        </Col>
+    </Row>
+    <Ckeditor {...{setBody}} />
 
     <Row gutter={16}>
         <Col span={24} >
@@ -143,7 +144,7 @@ const AddPost = () => {
             </Form.Item>
         </Col>
     </Row>
-    <Form.Item label="Status & Visibility">
+    <Form.Item label="Public Comment">
         <Switch defaultChecked onChange={changeStatus} />
     </Form.Item>
 

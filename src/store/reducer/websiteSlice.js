@@ -15,7 +15,7 @@ const initialState = {
 export const addWebsite = createAsyncThunk('user/addWebsite', async (data, { rejectWithValue }) => {
 
     try {
-        const response = await axiosInstance.post("/v1/dashboard/websites", data, AuthHeader)
+        const response = await axiosInstance.post("/posts", data,AuthHeader)
         return response
     } catch (err) {
         if (!err.response) {
@@ -26,16 +26,28 @@ export const addWebsite = createAsyncThunk('user/addWebsite', async (data, { rej
     }
 })
 export const getWebsites = createAsyncThunk('user/posts', async (status = "active") => {
-    const response = await axiosInstance.get(`/posts`)
-  
+    console.log("AuthHeader",AuthHeader);
+    const response = await axiosInstance.get(`/posts`,AuthHeader)
     return response.data
 })
 
+export const uploadPostImage = createAsyncThunk('user/posts/upload', async (data) => {
+    try {
+        const response = await axiosInstance.post(`/posts/upload`, data,AuthHeader)
+        console.log("response",response);
+        return response.data
+
+    } catch (err) {
+        if (!err.response) {
+            throw err
+        }
+        return err.response
+    }
+})
 export const deleteWebsite = createAsyncThunk('user/deleteWebsite', async (id, { rejectWithValue }) => {
     try {
-        const response = await axiosInstance.delete(`/posts/${id}`)
+        const response = await axiosInstance.delete(`/posts/${id}`,AuthHeader)
         return response
-        console.log("response".response);
     } catch (err) {
         if (!err.response) {
             throw err
@@ -139,7 +151,7 @@ const websiteSlice = createSlice({
             })
             .addCase(trashWebsite.fulfilled, (state, action) => {
                 state.websites = state.websites.filter(obj => {
-                  
+
                     return obj._id !== action.payload.data._id;
                 })
                 state.isLoad = false
@@ -153,9 +165,7 @@ const websiteSlice = createSlice({
                 state.isLoad = true
             })
             .addCase(getWebsites.fulfilled, (state, action) => {
-                
                 state.websites = action.payload.result
-                console.log("action.payload.result",action.payload.result);
                 state.error = null
                 state.isLoad = false
             })

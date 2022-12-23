@@ -1,5 +1,6 @@
 class MyUploadAdapter {
     constructor(loader) {
+      console.log("jdjfh");
       this.loader = loader;
     }
     // Starts the upload process.
@@ -23,6 +24,7 @@ class MyUploadAdapter {
   
     // Initializes the XMLHttpRequest object using the URL passed to the constructor.
     _initRequest() {
+   
       const xhr = (this.xhr = new XMLHttpRequest());
       xhr.open(
         "POST",
@@ -34,6 +36,7 @@ class MyUploadAdapter {
   
     // Initializes XMLHttpRequest listeners.
     _initListeners(resolve, reject, file) {
+    
       const { xhr } = this;
       const { loader } = this;
       const genericErrorText = `Couldn't upload file: ${file.name}.`;
@@ -54,11 +57,8 @@ class MyUploadAdapter {
             response && response.error ? response.error.message : genericErrorText
           );
         }
-  
-        // If the upload is successful, resolve the upload promise with an object containing
-        // at least the "default" URL, pointing to the image on the server.
-        // This URL will be used to display the image in the content. Learn more in the
-        // UploadAdapter#upload documentation.
+
+    
         resolve({
           default: response.url
         });
@@ -80,6 +80,7 @@ class MyUploadAdapter {
     // Prepares the data and sends the request.
     _sendRequest(file) {
       // Prepare the form data.
+      console.log("dfdkjghd");
       const data = new FormData();
   
       data.append("post", file);

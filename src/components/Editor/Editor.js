@@ -2,9 +2,13 @@ import React, { Component, useRef } from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import MyUploadAdapter from './MyuploadAdaptor';
+import { useDispatch } from 'react-redux';
+import { uploadPostImage } from '../../store/reducer/websiteSlice';
+import { Form } from 'react-router-dom';
 
 
-const Ckeditor =()=> {
+const Ckeditor =({setBody})=> {
+    const dispatch=useDispatch()
     const allowDrop = (ev) => {
         ev.preventDefault();
       }
@@ -13,7 +17,32 @@ const Ckeditor =()=> {
         var data = ev.dataTransfer.getData("text");
         ev.target.appendChild(document.getElementById(data));
       }
-      const hello=(loader)=>{
+      const uploadPostContent=(loader)=>{
+        return{
+            upload:()=>{
+                return new Promise((resolve,reject)=>{
+                    try {
+                        loader.file.then((file)=>{
+                            let formData=new FormData()
+                            console.log("file",file);
+                            formData.append("image",file)
+                            dispatch(uploadPostImage(formData)).then((res)=>{
+                                console.log("res edit", res.payload.file.filename);
+                                resolve({
+                                    default:"http://localhost:2500/images/"+ res.payload.file.filename
+                                  });
+                            }).catch((err)=>{
+                                reject(err)
+                            })
+                        })
+                    } catch (error) {
+                        reject(error)
+                    }
+                })
+            }
+        }
+      }
+const hello=(loader)=>{
     return{
       upload:()=>{
         return new Promise((resolve,reject)=>{
@@ -52,14 +81,14 @@ const Ckeditor =()=> {
                     data="<p>Hello from CKEditor 5!</p>"
                     onReady={ editor => {
                         // You can store the "editor" and use when it is needed.
-                        console.log( 'Editor is ready to use!', editor );
+                        // console.log( 'Editor is ready to use!', editor );
                     } }
 
                 
                       config={{
                         extraPlugins:[function(editor) {editor.plugins.get( 'FileRepository' ).createUploadAdapter = ( loader ) => {
                             // return new MyUploadAdapter(loader); 
-                           return hello(loader); 
+                           return uploadPostContent(loader); 
                             }}],
                         toolbar: [
                           "selectAll",
@@ -126,16 +155,16 @@ const Ckeditor =()=> {
                       }}
                     onChange={ ( event, editor ) => {
                         const data = editor.getData();
-                        console.log( { event, editor, data } );
-                    
-            
+                        console.log("daa",data);
+                       setBody(data)
+
                     } }
                     onBlur={ ( event, editor ) => {
-                        console.log( 'Blur.', editor );
+                        // console.log( 'Blur.', editor );
                        
                     } }
                     onFocus={ ( event, editor ) => {
-                        console.log( 'Focus.', editor );
+                        // console.log( 'Focus.', editor );
                     } }
                 />
             </div>

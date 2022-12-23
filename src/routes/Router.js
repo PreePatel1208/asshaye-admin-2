@@ -14,7 +14,6 @@ import PrivateRoute from '../helper/PrivateRoute';
 import Website from '../pages/admin/website/Website';
 import AddPost from '../pages/admin/website/AddPost';
 import Country from '../pages/admin/country/Country';
-import Role from '../pages/admin/roles/Role';
 
 const Router = () => {
   const getuser = localStorage.getItem('userAuthToken')

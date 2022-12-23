@@ -13,8 +13,8 @@ const initialState = {
 
 export const login = createAsyncThunk('user/login', async (initialPost, { rejectWithValue }) => {
     try {
-        const response = await axiosInstance.post("/v1/dashboard/auth/login", initialPost)
-        return response.data
+        const response = await axiosInstance.post("/login", initialPost)
+        return response
     } catch (err) {
         if (!err.response) {
             throw err
@@ -130,8 +130,9 @@ const userSlice = createSlice({
     extraReducers(builder) {
         builder
             .addCase(login.fulfilled, (state, action) => {
+                
                 state.error = null
-                localStorage.setItem("userAuthToken", action.payload.access_token)
+                localStorage.setItem("userAuthToken", action.payload.data.data.token)
                 state.isLoad = false
             })
             .addCase(login.rejected, (state, error) => {
