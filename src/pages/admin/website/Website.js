@@ -75,13 +75,14 @@ const Website = () => {
     }
 
     const editWebsiteDetail = async (element) => {
-        setIsEdit(true)
-        setIsAddModalOpen(true)
-        form.setFieldsValue({
-            website: element.title,
-            sort: element.sort,
-            id: element.encrypt_id
-        });
+        nevigate(`/posts/update/${element._id}`,)
+        // setIsEdit(true)
+        // setIsAddModalOpen(true)
+        // form.setFieldsValue({
+        //     website: element.title,
+        //     sort: element.sort,
+        //     id: element.encrypt_id
+        // });
     }
     const { Option } = Select;
     useEffect(() => {
@@ -287,8 +288,6 @@ const Website = () => {
                         type: Checkbox,
 
                     }} columns={columns} dataSource={dataSource} onChange={handleChange} />
-
-
 
             </div>
 

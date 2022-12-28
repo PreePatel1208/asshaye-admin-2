@@ -37,6 +37,7 @@ const Router = () => {
           <Route path='/' element={getuser ? <Navigate to="/dashboard" replace={true} /> : <Navigate to="/auth/login" replace={true} />} />
           <Route path="/posts" element={<Website />} />
           <Route path="/posts/create" element={<AddPost />} />
+          <Route path="/posts/update/:id" element={<AddPost />} />
           <Route path="/comment" element={<Country />} />  
         </Route>
       </Routes>

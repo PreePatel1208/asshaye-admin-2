@@ -7,7 +7,7 @@ import { uploadPostImage } from '../../store/reducer/websiteSlice';
 import { Form } from 'react-router-dom';
 
 
-const Ckeditor =({setBody})=> {
+const Ckeditor =({body,setBody})=> {
     const dispatch=useDispatch()
     const allowDrop = (ev) => {
         ev.preventDefault();
@@ -78,7 +78,7 @@ const hello=(loader)=>{
                 ref={textareaRef}
                 className="dropzone"
                     editor={ ClassicEditor }
-                    data="<p>Hello from CKEditor 5!</p>"
+                    data={body}
                     onReady={ editor => {
                         // You can store the "editor" and use when it is needed.
                         // console.log( 'Editor is ready to use!', editor );

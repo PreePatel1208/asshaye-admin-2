@@ -2,6 +2,7 @@ import { createSlice, nanoid, createAsyncThunk } from "@reduxjs/toolkit";
 import { data } from "jquery";
 import AuthHeader from "../../services/APIRoute/AuthHeader";
 import axiosInstance from "../../services/APIRoute/BaseAPIRoute";
+import { useParams } from "react-router-dom";
 
 
 const initialState = {
@@ -15,7 +16,7 @@ const initialState = {
 export const addWebsite = createAsyncThunk('user/addWebsite', async (data, { rejectWithValue }) => {
 
     try {
-        const response = await axiosInstance.post("/posts", data,AuthHeader)
+        const response = await axiosInstance.post("/posts", data, AuthHeader)
         return response
     } catch (err) {
         if (!err.response) {
@@ -26,15 +27,26 @@ export const addWebsite = createAsyncThunk('user/addWebsite', async (data, { rej
     }
 })
 export const getWebsites = createAsyncThunk('user/posts', async (status = "active") => {
-    console.log("AuthHeader",AuthHeader);
-    const response = await axiosInstance.get(`/posts`,AuthHeader)
+    console.log("AuthHeader", AuthHeader);
+    try {
+        const response = await axiosInstance.get(`/posts`, AuthHeader)
+        console.log("response", response.data);
+
+        return response.data
+    } catch (error) {
+        if (error) {
+            console.log(error);
+            return error.response
+        }
+    }
+    const response = await axiosInstance.get(`/posts`, AuthHeader)
     return response.data
 })
 
 export const uploadPostImage = createAsyncThunk('user/posts/upload', async (data) => {
     try {
-        const response = await axiosInstance.post(`/posts/upload`, data,AuthHeader)
-        console.log("response",response);
+        const response = await axiosInstance.post(`/posts/upload`, data, AuthHeader)
+        console.log("response", response);
         return response.data
 
     } catch (err) {
@@ -46,7 +58,7 @@ export const uploadPostImage = createAsyncThunk('user/posts/upload', async (data
 })
 export const deleteWebsite = createAsyncThunk('user/deleteWebsite', async (id, { rejectWithValue }) => {
     try {
-        const response = await axiosInstance.delete(`/posts/${id}`,AuthHeader)
+        const response = await axiosInstance.delete(`/posts/${id}`, AuthHeader)
         return response
     } catch (err) {
         if (!err.response) {
@@ -56,18 +68,34 @@ export const deleteWebsite = createAsyncThunk('user/deleteWebsite', async (id, {
         return rejectWithValue(err.response)
     }
 })
-export const editWebsite = createAsyncThunk('user/editWebsite', async (data) => {
+export const editWebsite = createAsyncThunk('post/update', async (data) => {
+
     try {
-        const response = await axiosInstance.put(`/v1/dashboard/websites/${data[1].id}`, data[0], AuthHeader)
-        response.data = data
+        const response = await axiosInstance.put(`posts/${data.id}`, data.data, AuthHeader)
         return response
     } catch (err) {
         if (!err.response) {
             throw err
         }
+        console.log("err",err);
         return err.response
     }
 })
+
+export const slugCheck = createAsyncThunk('post/update', async (slug) => {
+
+    try {
+        const response = await axiosInstance.get(`posts/slug/${slug}`, AuthHeader)
+        return response
+    } catch (err) {
+        if (!err.response) {
+            throw err
+        }
+        console.log("err",err);
+        return err.response
+    }
+})
+
 
 export const trashWebsite = createAsyncThunk('user/trashWebsite', async (id, { rejectWithValue }) => {
     try {
@@ -85,6 +113,17 @@ export const restoreWebsite = createAsyncThunk('user/trashWebsite', async (id, {
     try {
         const response = await axiosInstance.post(`/v1/dashboard/websites/restore/${id}`, AuthHeader)
         response.data.id = id
+        return response
+    } catch (err) {
+        if (!err.response) {
+            throw err
+        }
+        return rejectWithValue(err.response)
+    }
+})
+export const getSinglePost = createAsyncThunk('posts/edit/detail', async (id, { rejectWithValue }) => {
+    try {
+        const response = await axiosInstance.get(`posts/edit/${id}`, AuthHeader)
         return response
     } catch (err) {
         if (!err.response) {
@@ -121,10 +160,7 @@ const websiteSlice = createSlice({
                 state.isLoad = true
             })
             .addCase(editWebsite.fulfilled, (state, action) => {
-                var index = state.websites.findIndex(obj => obj.encrypt_id == action.payload.data[1].id);
-                state.websites[index].title = action.payload.data[0].title
-                state.websites[index].sort = action.payload.data[0].sort
-                state.websites[index].status = action.payload.data[0].status ? 1 : 0
+
                 state.isLoad = false
                 state.error = null
             })
@@ -166,6 +202,7 @@ const websiteSlice = createSlice({
             })
             .addCase(getWebsites.fulfilled, (state, action) => {
                 state.websites = action.payload.result
+                console.log("action.payload", action.payload);
                 state.error = null
                 state.isLoad = false
             })
@@ -174,6 +211,19 @@ const websiteSlice = createSlice({
                 state.isLoad = false
             })
             .addCase(getWebsites.pending, (state, error) => {
+                state.error = error
+                state.isLoad = true
+            })
+            .addCase(getSinglePost.fulfilled, (state, action) => {
+                console.log("action.payload", action.payload);
+                state.error = null
+                state.isLoad = false
+            })
+            .addCase(getSinglePost.rejected, (state, error) => {
+                state.error = error
+                state.isLoad = false
+            })
+            .addCase(getSinglePost.pending, (state, error) => {
                 state.error = error
                 state.isLoad = true
             })

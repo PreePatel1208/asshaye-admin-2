@@ -132,7 +132,8 @@ const userSlice = createSlice({
             .addCase(login.fulfilled, (state, action) => {
                 
                 state.error = null
-                localStorage.setItem("userAuthToken", action.payload.data.data.token)
+                localStorage.removeItem("auth-token");
+                localStorage.setItem("auth-token", action.payload.data.data.token)
                 state.isLoad = false
             })
             .addCase(login.rejected, (state, error) => {
